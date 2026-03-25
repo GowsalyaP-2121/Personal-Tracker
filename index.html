@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Planora — Your AI Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+
+/* ══════════════════════════════════════
+   LOGIN PAGE
+══════════════════════════════════════ */
+#login-screen{
+  position:fixed;inset:0;z-index:9999;
+  background:#0a0c14;
+  display:flex;align-items:stretch;
+  font-family:'Nunito',sans-serif;
+  overflow:hidden;
+}
+#login-screen.hidden{display:none}
+
+/* animated bg grid */
+.login-bg{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;
+}
+.login-bg-grid{
+  position:absolute;inset:-50%;
+  background-image:
+    linear-gradient(rgba(79,110,247,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(79,110,247,.07) 1px,transparent 1px);
+  background-size:48px 48px;
+  animation:gridShift 20s linear infinite;
+}
+@keyframes gridShift{from{transform:translate(0,0)}to{transform:translate(48px,48px)}}
+.login-bg-glow1{position:absolute;top:-10%;left:-10%;width:60%;height:60%;background:radial-gradient(circle,rgba(79,110,247,.18) 0%,transparent 70%);animation:floatGlow 8s ease-in-out infinite alternate}
+.login-bg-glow2{position:absolute;bottom:-10%;right:-5%;width:50%;height:55%;background:radial-gradient(circle,rgba(34,201,142,.12) 0%,transparent 70%);animation:floatGlow 10s ease-in-out infinite alternate-reverse}
+.login-bg-glow3{position:absolute;top:40%;left:30%;width:40%;height:40%;background:radial-gradient(circle,rgba(168,85,247,.08) 0%,transparent 70%);animation:floatGlow 12s ease-in-out infinite alternate}
+@keyframes floatGlow{0%{transform:scale(1) translate(0,0)}100%{transform:scale(1.2) translate(20px,-20px)}}
+
+/* floating orbs */
+.orb{position:absolute;border-radius:50%;animation:orbFloat linear infinite}
+@keyframes orbFloat{0%{transform:translateY(110vh) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:.5}100%{transform:translateY(-20vh) rotate(720deg);opacity:0}}
+
+/* left panel (branding) */
+.login-left{
+  flex:1;position:relative;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:48px 40px;
+  overflow:hidden;
+}
+.login-left-inner{position:relative;z-index:2;text-align:center;max-width:400px}
+.login-logo-wrap{
+  width:80px;height:80px;border-radius:24px;
+  background:linear-gradient(135deg,#4f6ef7,#22c98e);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;
+  box-shadow:0 8px 40px rgba(79,110,247,.5);
+  animation:logoBob 3s ease-in-out infinite;
+}
+@keyframes logoBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.login-logo-wrap svg{width:44px;height:44px;stroke:#fff}
+.login-brand{font-family:'Playfair Display',serif;font-size:52px;font-weight:800;color:#fff;letter-spacing:-1px;line-height:1;margin-bottom:10px}
+.login-tagline{font-size:17px;color:rgba(255,255,255,.55);font-weight:600;line-height:1.6;margin-bottom:40px}
+/* floating feature pills */
+.login-pills{display:flex;flex-direction:column;gap:12px;width:100%}
+.login-pill{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;padding:13px 16px;
+  backdrop-filter:blur(10px);
+  animation:pillSlide .6s ease both;
+}
+@keyframes pillSlide{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+.login-pill-icon{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.login-pill-icon svg{width:19px;height:19px;stroke:#fff}
+.login-pill-text strong{display:block;font-size:13px;color:#fff;font-weight:800;margin-bottom:1px}
+.login-pill-text span{font-size:11px;color:rgba(255,255,255,.5);font-weight:600}
+
+/* right panel (form) */
+.login-right{
+  width:440px;flex-shrink:0;
+  background:rgba(255,255,255,.03);
+  border-left:1px solid rgba(255,255,255,.07);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:48px 36px;position:relative;z-index:2;
+  backdrop-filter:blur(20px);
+}
+@media(max-width:768px){
+  .login-left{display:none}
+  .login-right{width:100%;border:none;padding:32px 24px;justify-content:center}
+}
+.login-form-logo{
+  width:56px;height:56px;border-radius:18px;
+  background:linear-gradient(135deg,#4f6ef7,#22c98e);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 14px;
+  box-shadow:0 4px 24px rgba(79,110,247,.4);
+}
+.login-form-logo svg{width:30px;height:30px;stroke:#fff}
+.login-form-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:800;color:#fff;text-align:center;margin-bottom:4px}
+.login-form-sub{font-size:13px;color:rgba(255,255,255,.45);text-align:center;font-weight:600;margin-bottom:32px}
+
+/* tabs */
+.auth-tabs{display:flex;background:rgba(255,255,255,.06);border-radius:12px;padding:4px;margin-bottom:24px;width:100%}
+.auth-tab{
+  flex:1;text-align:center;padding:9px;border-radius:9px;
+  font-size:14px;font-weight:800;cursor:pointer;color:rgba(255,255,255,.4);transition:all .2s;
+}
+.auth-tab.active{background:rgba(79,110,247,.5);color:#fff;box-shadow:0 2px 12px rgba(79,110,247,.3)}
+
+/* fields */
+.lf-group{margin-bottom:16px;width:100%}
+.lf-label{font-size:12px;font-weight:800;color:rgba(255,255,255,.5);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.7px}
+.lf-input-wrap{position:relative}
+.lf-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;stroke:rgba(255,255,255,.3);fill:none;stroke-width:1.8;stroke-linecap:round}
+.lf-input{
+  width:100%;background:rgba(255,255,255,.07);
+  border:1.5px solid rgba(255,255,255,.1);
+  border-radius:12px;color:#fff;
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;
+  padding:12px 14px 12px 40px;outline:none;transition:all .2s;
+}
+.lf-input::placeholder{color:rgba(255,255,255,.3)}
+.lf-input:focus{border-color:rgba(79,110,247,.7);background:rgba(79,110,247,.08);box-shadow:0 0 0 3px rgba(79,110,247,.15)}
+.lf-input.error{border-color:rgba(242,92,84,.7);background:rgba(242,92,84,.06)}
+
+.lf-error{font-size:11px;color:#f25c54;font-weight:700;margin-top:5px;display:none}
+.lf-error.show{display:block}
+
+/* submit btn */
+.lf-btn{
+  width:100%;padding:14px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,#4f6ef7,#22c98e);
+  color:#fff;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;
+  cursor:pointer;transition:all .22s;margin-top:6px;
+  box-shadow:0 4px 22px rgba(79,110,247,.4);
+  position:relative;overflow:hidden;
+}
+.lf-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);opacity:0;transition:opacity .2s}
+.lf-btn:hover{box-shadow:0 6px 30px rgba(79,110,247,.6);transform:translateY(-1px)}
+.lf-btn:hover::after{opacity:1}
+.lf-btn:active{transform:translateY(0);box-shadow:0 2px 12px rgba(79,110,247,.4)}
+.lf-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+/* divider */
+.lf-or{display:flex;align-items:center;gap:10px;margin:18px 0;color:rgba(255,255,255,.25);font-size:12px;font-weight:700;width:100%}
+.lf-or::before,.lf-or::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1)}
+
+/* social btn */
+.lf-social{
+  width:100%;padding:12px;border-radius:12px;
+  border:1.5px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.05);color:rgba(255,255,255,.7);
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;
+  cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:9px;
+}
+.lf-social:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
+.lf-social svg{width:18px;height:18px;flex-shrink:0}
+
+/* strength bar */
+.pwd-strength{margin-top:7px}
+.pwd-str-bar{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.pwd-str-fill{height:100%;border-radius:2px;width:0;transition:width .3s,background .3s}
+.pwd-str-lbl{font-size:10px;font-weight:800;color:rgba(255,255,255,.35)}
+
+/* show pw toggle */
+.lf-eye{position:absolute;right:13px;top:50%;transform:translateY(-50%);cursor:pointer;stroke:rgba(255,255,255,.3);fill:none;stroke-width:1.8;stroke-linecap:round;width:17px;height:17px;transition:stroke .2s}
+.lf-eye:hover{stroke:rgba(255,255,255,.7)}
+
+/* terms */
+.lf-terms{font-size:11px;color:rgba(255,255,255,.3);text-align:center;font-weight:600;margin-top:18px;line-height:1.6}
+.lf-terms a{color:rgba(79,110,247,.8);text-decoration:underline;cursor:pointer}
+
+/* success state */
+.login-success{display:none;text-align:center;padding:20px 0}
+.login-success.show{display:block}
+.success-check{
+  width:70px;height:70px;border-radius:50%;
+  background:linear-gradient(135deg,#4f6ef7,#22c98e);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 16px;
+  animation:successPop .4s cubic-bezier(.22,1,.36,1);
+}
+@keyframes successPop{from{transform:scale(0)}to{transform:scale(1)}}
+.success-check svg{width:34px;height:34px;stroke:#fff}
+.success-title{font-size:20px;font-weight:900;color:#fff;margin-bottom:6px}
+.success-sub{font-size:13px;color:rgba(255,255,255,.5);font-weight:600}
+/* ══ END LOGIN ══ */
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f7f8fc;--surface:#fff;--surface2:#f0f2fa;
+  --border:#e2e5f0;--border2:#c8cce0;
+  --txt1:#1a1d2e;--txt2:#5a5f80;--txt3:#9fa5c0;
+  --blue:#4f6ef7;--blue-lt:#eef1ff;--blue-md:#d4dcff;
+  --green:#22c98e;--green-lt:#edfaf4;
+  --red:#f25c54;--red-lt:#fff0ef;
+  --orange:#f9a825;--orange-lt:#fff8e6;
+  --purple:#a855f7;--purple-lt:#f5eeff;
+  --sh:0 2px 16px rgba(0,0,0,.07);--sh2:0 6px 32px rgba(0,0,0,.12);
+  --r:14px;--rl:20px;
+}
+body.dark{
+  --bg:#0f1117;--surface:#181c27;--surface2:#1e2336;
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.15);
+  --txt1:#eef0ff;--txt2:#8b90b5;--txt3:#4a5070;
+  --blue-lt:rgba(79,110,247,.12);--blue-md:rgba(79,110,247,.25);
+  --green-lt:rgba(34,201,142,.1);--red-lt:rgba(242,92,84,.1);
+  --orange-lt:rgba(249,168,37,.1);--purple-lt:rgba(168,85,247,.1);
+  --sh:0 2px 16px rgba(0,0,0,.3);--sh2:0 6px 32px rgba(0,0,0,.5);
+}
+html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt1);overflow-x:hidden;-webkit-tap-highlight-color:transparent;transition:background .3s,color .3s}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── BOTTOM NAV ── */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--surface);border-top:1.5px solid var(--border);display:flex;align-items:stretch;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -3px 18px rgba(0,0,0,.06)}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 4px 8px;cursor:pointer;border:none;background:none;color:var(--txt3);position:relative;font-family:'Nunito',sans-serif;transition:color .18s}
+.bni.active{color:var(--blue)}
+.bni svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.bni span{font-size:10px;font-weight:700;letter-spacing:.2px}
+.bni-dot{position:absolute;top:7px;right:calc(50% - 14px);background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:20px;min-width:16px;text-align:center;font-family:'JetBrains Mono',monospace}
+
+/* ── SCROLL AREA ── */
+.scrl{height:100vh;overflow-y:auto;padding-bottom:90px;-webkit-overflow-scrolling:touch}
+
+/* ── TOPBAR ── */
+.topbar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1.5px solid var(--border);padding:13px 18px 11px;display:flex;align-items:center;gap:10px}
+.logo-wrap{flex:1;display:flex;align-items:center;gap:9px}
+.logo-svg{width:36px;height:36px;flex-shrink:0}
+.logo-name{font-size:21px;font-weight:900;letter-spacing:-.5px;background:linear-gradient(135deg,var(--blue),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ic-btn{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s;flex-shrink:0}
+.ic-btn:active{background:var(--blue-lt);border-color:var(--blue)}
+.ic-btn svg{width:18px;height:18px;stroke:var(--txt2);fill:none;stroke-width:1.8;stroke-linecap:round}
+.user-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff;cursor:pointer;flex-shrink:0}
+
+/* ── PAGE WRAPPER ── */
+.page{display:none}
+.page.active{display:block;animation:fadeUp .22s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PAGE HEADER ── */
+.pg-head{padding:18px 18px 4px}
+.pg-head h1{font-size:24px;font-weight:900;letter-spacing:-.4px;line-height:1.2}
+.pg-head p{font-size:13.5px;color:var(--txt2);margin-top:5px;font-weight:600;line-height:1.55}
+
+/* ── HERO CARD ── */
+.hero-card{margin:14px 18px 0;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:var(--rl);padding:18px 18px 16px;color:#fff;position:relative;overflow:hidden}
+.hero-card::after{content:'';position:absolute;right:-24px;top:-24px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.08)}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.hero-lbl{font-size:10px;font-weight:800;opacity:.8;text-transform:uppercase;letter-spacing:1px}
+.hero-title{font-size:18px;font-weight:900;margin-top:3px;line-height:1.3}
+.hero-sub{font-size:12.5px;opacity:.78;font-weight:600;margin-top:3px}
+.hero-prog{background:rgba(255,255,255,.22);border-radius:6px;height:6px;margin-top:14px;overflow:hidden}
+.hero-fill{height:100%;background:#fff;border-radius:6px;transition:width .5s ease}
+.hero-pct{font-size:11.5px;font-weight:800;opacity:.9;margin-top:6px}
+.hero-badge{background:rgba(255,255,255,.22);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:800;backdrop-filter:blur(4px);white-space:nowrap}
+
+/* ── STAT CARDS ── */
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 18px 0}
+.scard{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:15px 13px;display:flex;align-items:center;gap:11px;transition:all .18s}
+.scard:active{transform:scale(.98)}
+.scard-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.scard-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.scard-num{font-size:26px;font-weight:900;line-height:1;letter-spacing:-.5px}
+.scard-lbl{font-size:12px;font-weight:700;color:var(--txt2);margin-top:2px}
+
+/* ── TIP BOX ── */
+.tip{margin:14px 18px 0;background:var(--blue-lt);border:1.5px solid var(--blue-md);border-radius:var(--r);padding:13px 15px;display:flex;align-items:flex-start;gap:9px}
+.tip svg{width:17px;height:17px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0;margin-top:1px}
+.tip p{font-size:13px;font-weight:700;color:var(--blue);line-height:1.6}
+
+/* ── PANEL ── */
+.panel{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rl);margin:14px 18px 0;overflow:hidden}
+.phead{padding:15px 16px 11px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.ptitle{font-size:15.5px;font-weight:800}
+.plink{font-size:13px;font-weight:700;color:var(--blue);cursor:pointer}
+
+/* ── TASK ROWS ── */
+.trow{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);transition:background .15s}
+.trow:last-child{border:none}
+.trow:active{background:var(--surface2)}
+.chk{width:24px;height:24px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all .18s;background:transparent}
+.chk:active{border-color:var(--green)}
+.chk.done{background:var(--green);border-color:var(--green)}
+.chk svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;opacity:0;transition:opacity .15s}
+.chk.done svg{opacity:1}
+.tinfo{flex:1;min-width:0}
+.tname{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:all .18s}
+.tname.done{text-decoration:line-through;color:var(--txt3)}
+.tmeta{display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap}
+.pill{font-size:10px;font-weight:800;padding:2px 9px;border-radius:20px;white-space:nowrap}
+.ph{background:var(--red-lt);color:var(--red)}
+.pm{background:var(--orange-lt);color:var(--orange)}
+.pl{background:var(--green-lt);color:var(--green)}
+.po{background:var(--red-lt);color:var(--red);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.55}}
+.pdate{background:var(--surface2);color:var(--txt3);display:flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px}
+.pdate svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round}
+.txp{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--orange);background:var(--orange-lt);padding:2px 8px;border-radius:20px;flex-shrink:0}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:36px 22px}
+.empty-ic{width:60px;height:60px;border-radius:18px;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.empty-ic svg{width:30px;height:30px;stroke:var(--blue);fill:none;stroke-width:1.6;stroke-linecap:round}
+.empty h3{font-size:17px;font-weight:800;margin-bottom:7px}
+.empty p{font-size:13.5px;color:var(--txt2);font-weight:600;line-height:1.6;margin-bottom:18px}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:76px;right:18px;z-index:150;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(79,110,247,.45);transition:all .2s}
+.fab:active{transform:scale(1.08);box-shadow:0 6px 28px rgba(79,110,247,.6)}
+.fab svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:13px 20px;border-radius:50px;border:2px solid var(--border2);background:transparent;color:var(--txt1);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .18s;flex:1;white-space:nowrap}
+.btn:active{background:var(--surface2)}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;flex-shrink:0}
+.btn-blue{background:linear-gradient(135deg,var(--blue),var(--purple));border-color:transparent;color:#fff;box-shadow:0 3px 16px rgba(79,110,247,.38)}
+.btn-blue:active{box-shadow:0 5px 24px rgba(79,110,247,.55);transform:translateY(-1px)}
+.btn-sm{padding:9px 18px;font-size:13px;border-radius:22px;flex:none}
+
+/* ── AI CHAT ── */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 58px - 68px - env(safe-area-inset-bottom));padding:10px 18px 0}
+.ai-hdr{background:var(--blue-lt);border:1.5px solid var(--blue-md);border-radius:var(--rl);padding:13px 15px;margin-bottom:11px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.ai-orb{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--green));display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:aip 2.5s infinite}
+@keyframes aip{0%,100%{box-shadow:0 0 0 0 rgba(79,110,247,.4)}50%{box-shadow:0 0 0 8px rgba(79,110,247,0)}}
+.ai-orb svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round}
+.ai-ttl{font-size:15px;font-weight:900}
+.ai-sub{font-size:12px;color:var(--txt2);font-weight:600;margin-top:2px}
+.qchips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:11px;flex-shrink:0}
+.qchip{padding:8px 14px;border-radius:22px;border:1.5px solid var(--blue-md);background:var(--surface);color:var(--blue);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .18s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.qchip svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.qchip:active{background:var(--blue-lt);transform:translateY(-1px)}
+.msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px 0;min-height:0}
+.cmsg{display:flex;align-items:flex-end;gap:8px;animation:fadeUp .2s ease}
+.cmsg.user{flex-direction:row-reverse}
+.cmav{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+.cmav.ai{background:linear-gradient(135deg,var(--blue),var(--green))}
+.cmav.ai svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round}
+.cmav.you{background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff}
+.cbub{max-width:82%;padding:11px 14px;border-radius:18px;font-size:13.5px;font-weight:600;line-height:1.65}
+.cbub.ai{background:var(--surface);border:1.5px solid var(--border);border-bottom-left-radius:5px}
+.cbub.user{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;border-bottom-right-radius:5px}
+.cbub.typing{display:flex;gap:5px;align-items:center;justify-content:center;min-width:56px;padding:14px 16px}
+.tdot{width:7px;height:7px;border-radius:50%;animation:td 1.2s infinite}
+.tdot:nth-child(1){background:var(--blue)}
+.tdot:nth-child(2){background:var(--green);animation-delay:.2s}
+.tdot:nth-child(3){background:var(--purple);animation-delay:.4s}
+@keyframes td{0%,100%{transform:scale(1);opacity:.3}50%{transform:scale(1.5);opacity:1}}
+.cinrow{display:flex;gap:8px;padding:9px 0 4px;flex-shrink:0}
+.cinput{flex:1;background:var(--surface);border:2px solid var(--border);border-radius:50px;color:var(--txt1);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;padding:11px 18px;outline:none;transition:border-color .2s}
+.cinput:focus{border-color:var(--blue)}
+.cinput::placeholder{color:var(--txt3)}
+.csend{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s}
+.csend:active{transform:scale(1.07);box-shadow:0 4px 16px rgba(79,110,247,.4)}
+.csend svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round}
+
+/* ── FOCUS TIMER ── */
+.timersec{padding:14px 18px 0}
+.timerbox{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rl);padding:26px 20px;text-align:center;margin-bottom:14px}
+.tstate{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:16px;font-family:'JetBrains Mono',monospace}
+.tring{position:relative;width:160px;height:160px;margin:0 auto 18px}
+.tring svg{transform:rotate(-90deg);width:160px;height:160px}
+.t-track{fill:none;stroke:var(--border);stroke-width:10}
+.t-fill{fill:none;stroke:url(#tg);stroke-width:10;stroke-linecap:round;stroke-dasharray:439.8;transition:stroke-dashoffset 1s linear}
+.tinner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.tnum{font-family:'JetBrains Mono',monospace;font-size:34px;font-weight:700;letter-spacing:2px;line-height:1}
+.tsub{font-size:11px;font-weight:800;color:var(--txt3);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.presets{display:flex;gap:8px;justify-content:center;margin-bottom:15px;flex-wrap:wrap}
+.prst{padding:8px 18px;border-radius:22px;border:2px solid var(--border);background:transparent;color:var(--txt2);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .18s}
+.prst.sel,.prst:active{border-color:var(--blue);background:var(--blue-lt);color:var(--blue)}
+.tacts{display:flex;gap:10px;justify-content:center}
+
+/* ── MOOD ── */
+.mood-row{display:flex;gap:8px;justify-content:center;padding:16px;flex-wrap:wrap}
+.mood-item{text-align:center;cursor:pointer;transition:all .18s}
+.mood-face{width:44px;height:44px;border-radius:12px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 5px;transition:all .18s}
+.mood-face.sel{border-color:var(--blue);background:var(--blue-lt)}
+.mood-lbl{font-size:10px;font-weight:800;color:var(--txt3)}
+.mood-lbl.sel{color:var(--blue)}
+.mood-status{text-align:center;font-size:12.5px;font-weight:700;color:var(--blue);padding:0 16px 14px;font-family:'JetBrains Mono',monospace;letter-spacing:.5px}
+
+/* ── HABITS ── */
+.habit-item{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 15px;margin-bottom:9px;display:flex;align-items:center;gap:11px}
+.habit-ic{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.habit-ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.habit-body{flex:1;min-width:0}
+.habit-name{font-size:13.5px;font-weight:800;margin-bottom:5px}
+.hdays{display:flex;gap:4px}
+.hday{width:22px;height:22px;border-radius:6px;background:var(--surface2);border:1.5px solid var(--border);cursor:pointer;transition:all .15s}
+.hday.done{background:var(--green);border-color:transparent}
+.hday:active{border-color:var(--green)}
+.hstreak{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--orange);background:var(--orange-lt);padding:3px 9px;border-radius:20px;flex-shrink:0}
+
+/* ── REWARDS ── */
+.rsec{padding:14px 18px 0}
+.streak-hero{background:linear-gradient(135deg,var(--red),var(--orange));border-radius:var(--rl);padding:20px;color:#fff;display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.sbolt{width:52px;height:52px;background:rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sbolt svg{width:28px;height:28px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round}
+.snum{font-size:36px;font-weight:900;line-height:1}
+.slbl{font-size:13px;opacity:.85;font-weight:700;margin-top:2px}
+.sbest{font-size:11px;opacity:.7;margin-top:4px}
+.lvl-box{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rl);padding:18px;margin-bottom:14px;display:flex;align-items:center;gap:14px}
+.lvl-ic{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lvl-ic svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round}
+.lvl-body{flex:1}
+.lvl-name{font-size:16px;font-weight:900;margin-bottom:4px}
+.lvl-xp{font-size:12px;color:var(--txt2);font-weight:700;margin-bottom:6px}
+.xpbar{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.xpfill{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:4px;transition:width .6s ease}
+.lvl-tag{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-lt);padding:3px 10px;border-radius:20px;display:inline-block;margin-top:6px}
+.badges-g{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bdg{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;transition:all .18s}
+.bdg:active{transform:translateY(-2px);box-shadow:var(--sh)}
+.bdg.earn{border-color:var(--orange);background:var(--orange-lt)}
+.bdg.lock{opacity:.4;filter:grayscale(1)}
+.bdg-ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px}
+.bdg-ic svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.bdg-n{font-size:12px;font-weight:800;margin-bottom:2px}
+.bdg-d{font-size:10px;color:var(--txt3);font-weight:600}
+
+/* ── FILTER BAR ── */
+.fbar{display:flex;gap:7px;padding:13px 18px 0;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none}
+.fbar::-webkit-scrollbar{display:none}
+.fpill{padding:8px 16px;border-radius:22px;border:2px solid var(--border);background:var(--surface);color:var(--txt2);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0}
+.fpill.active,.fpill:active{border-color:var(--blue);background:var(--blue-lt);color:var(--blue)}
+.sbox{margin:10px 18px 0;display:flex;align-items:center;gap:8px;background:var(--surface);border:2px solid var(--border);border-radius:50px;padding:10px 16px}
+.sbox svg{width:16px;height:16px;stroke:var(--txt3);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
+.sbox input{background:none;border:none;outline:none;color:var(--txt1);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;width:100%}
+.sbox input::placeholder{color:var(--txt3)}
+
+/* ── NOTIFICATIONS ── */
+.nsec{padding:14px 18px 0}
+.nitem{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 15px;margin-bottom:10px;display:flex;align-items:flex-start;gap:11px}
+.nic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.nbody{flex:1}
+.ntitle{font-size:13.5px;font-weight:800;margin-bottom:3px}
+.ndesc{font-size:12px;color:var(--txt2);font-weight:600;line-height:1.5}
+.ntime{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--txt3);margin-top:3px}
+
+/* ── SETTINGS ── */
+.ssec{padding:14px 18px 0}
+.scard{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rl);margin-bottom:12px;overflow:hidden}
+.sc-head{padding:13px 16px 11px;font-size:13px;font-weight:900;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+.srow{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+.srow:last-child{border:none}
+.sinfo .st{font-size:14px;font-weight:800}
+.sinfo .ss{font-size:12px;color:var(--txt2);font-weight:600;margin-top:2px}
+.tog{width:48px;height:26px;background:var(--border2);border-radius:13px;position:relative;cursor:pointer;transition:background .25s;flex-shrink:0}
+.tog.on{background:var(--blue)}
+.tok{width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:4px;left:4px;transition:transform .22s;box-shadow:0 1px 5px rgba(0,0,0,.25)}
+.tog.on .tok{transform:translateX(22px)}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .22s;padding:0}
+.modal-bg.open{opacity:1;pointer-events:all}
+.mbox{background:var(--surface);border-radius:28px 28px 0 0;padding:8px 20px 40px;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;transform:translateY(30px);transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.modal-bg.open .mbox{transform:translateY(0)}
+.mhandle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 18px;display:block}
+.mtitle{font-size:20px;font-weight:900;margin-bottom:20px;text-align:center}
+.fg{margin-bottom:15px}
+.flbl{font-size:13px;font-weight:800;color:var(--txt1);display:block;margin-bottom:6px}
+.fhint{font-size:11px;color:var(--txt3);font-weight:600;display:block;margin-bottom:6px;margin-top:-3px}
+.fi,.fsel{width:100%;background:var(--surface2);border:2px solid var(--border);border-radius:14px;color:var(--txt1);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;padding:12px 15px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.fi:focus,.fsel:focus{border-color:var(--blue)}
+.fta{min-height:80px;resize:vertical;line-height:1.5}
+.fsel option{background:var(--surface)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.macts{display:flex;gap:10px;margin-top:20px}
+
+/* ── CELEBRATION ── */
+.cel{position:fixed;inset:0;pointer-events:none;z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;padding:24px}
+.cel.show{opacity:1}
+.celbox{background:var(--surface);border:2px solid var(--green);border-radius:24px;padding:28px 32px;text-align:center;box-shadow:0 0 40px rgba(34,201,142,.2);transform:scale(.85);transition:transform .3s}
+.cel.show .celbox{transform:scale(1)}
+.cel-circle{width:60px;height:60px;background:linear-gradient(135deg,var(--blue),var(--green));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 13px}
+.cel-circle svg{width:28px;height:28px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+.celtitle{font-size:20px;font-weight:900;margin-bottom:4px}
+.celsub{font-size:13px;color:var(--txt2);font-weight:700}
+.celxp{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--green);margin-top:6px}
+.cfwrap{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.cf{position:absolute;width:8px;height:8px;border-radius:2px;animation:cfFall 2.8s ease-in forwards}
+@keyframes cfFall{0%{opacity:1;transform:translate(0,-10px) rotate(0)}100%{opacity:0;transform:translate(var(--dx),100vh) rotate(720deg)}}
+
+/* ── TOAST ── */
+.twrap{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9998;display:flex;flex-direction:column;gap:7px;pointer-events:none;width:calc(100% - 36px);max-width:360px}
+.toast{background:var(--txt1);color:var(--bg);border-radius:50px;padding:11px 18px;font-size:13px;font-weight:800;text-align:center;animation:fadeUp .3s ease;box-shadow:var(--sh2)}
+</style>
+</head>
+<body>
+
+<div class="scrl" id="scrl">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo-wrap">
+      <svg class="logo-svg" viewBox="0 0 36 36" fill="none">
+        <defs><linearGradient id="plg" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#4f6ef7"/><stop offset="100%" stop-color="#22c98e"/></linearGradient></defs>
+        <rect width="36" height="36" rx="10" fill="url(#plg)" opacity=".15"/>
+        <rect x="1" y="1" width="34" height="34" rx="9.5" stroke="url(#plg)" stroke-width="1.5"/>
+        <path d="M10 26V10h8.5a5.5 5.5 0 0 1 0 11H10" stroke="url(#plg)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="26" cy="24" r="3.5" fill="url(#plg)"/>
+      </svg>
+      <div class="logo-name">Planora</div>
+    </div>
+    <div class="ic-btn" onclick="goPage('notifications')">
+      <svg viewBox="0 0 18 18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 1a5 5 0 0 1 5 5v3l1.5 2H2.5L4 9V6a5 5 0 0 1 5-5z"/><path d="M7 15a2 2 0 0 0 4 0"/></svg>
+    </div>
+    <div class="user-av">AJ</div>
+  </div>
+
+  <!-- ═══ HOME ═══ -->
+  <div class="page active" id="pg-home">
+    <div class="pg-head">
+      <h1 id="greet">Good morning, Alex!</h1>
+      <p id="date-lbl">Let's get things done today.</p>
+    </div>
+    <div class="hero-card">
+      <div class="hero-top">
+        <div>
+          <div class="hero-lbl">Today's Goal</div>
+          <div class="hero-title" id="h-title">You have 3 tasks to do</div>
+          <div class="hero-sub" id="h-sub">Keep going — you're doing great!</div>
+        </div>
+        <div class="hero-badge">🔥 <span class="streak-number">8</span> days</div>
+      </div>
+      <div class="hero-prog"><div class="hero-fill" id="h-fill" style="width:58%"></div></div>
+      <div class="hero-pct" id="h-pct">7 of 12 tasks done (58%)</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="scard"><div class="scard-icon" style="background:var(--blue-lt)"><svg viewBox="0 0 22 22" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M3 6h16M3 11h10M3 16h7"/></svg></div><div><div class="scard-num" id="s-tot">12</div><div class="scard-lbl">Total Tasks</div></div></div>
+      <div class="scard"><div class="scard-icon" style="background:var(--green-lt)"><svg viewBox="0 0 22 22" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><path d="M4 11l5 5 9-9"/></svg></div><div><div class="scard-num" id="s-dn">7</div><div class="scard-lbl">Completed</div></div></div>
+      <div class="scard"><div class="scard-icon" style="background:var(--orange-lt)"><svg viewBox="0 0 22 22" stroke="var(--orange)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="9"/><path d="M11 7v4l3 3"/></svg></div><div><div class="scard-num" id="s-pnd">3</div><div class="scard-lbl">Pending</div></div></div>
+      <div class="scard"><div class="scard-icon" style="background:var(--red-lt)"><svg viewBox="0 0 22 22" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><path d="M11 5v6M11 14v.5"/><circle cx="11" cy="11" r="9"/></svg></div><div><div class="scard-num" id="s-ov">2</div><div class="scard-lbl">Overdue</div></div></div>
+    </div>
+
+    <div class="tip">
+      <svg viewBox="0 0 18 18" stroke-linecap="round" stroke-width="1.8"><circle cx="9" cy="9" r="8"/><path d="M9 5v4M9 11v.5"/></svg>
+      <p>Tap the circle next to any task to mark it done. Tap the <strong>+</strong> button at the bottom right to add a new task.</p>
+    </div>
+
+    <div class="panel">
+      <div class="phead"><div class="ptitle">Today's Tasks</div><div class="plink" onclick="goPage('tasks')">See all →</div></div>
+      <div id="dash-tasks"></div>
+    </div>
+
+    <div class="panel" style="margin-bottom:0">
+      <div class="phead"><div class="ptitle">Ask AI for Help</div><div class="plink" onclick="goPage('ai')">Full chat →</div></div>
+      <div style="padding:14px 16px">
+        <div class="qchips">
+          <div class="qchip" onclick="dashAI('What should I work on right now?')"><svg viewBox="0 0 12 12" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 4v2l1.5 1.5"/></svg>What next?</div>
+          <div class="qchip" onclick="dashAI('Any tasks that are overdue or urgent?')"><svg viewBox="0 0 12 12" stroke-width="2" stroke-linecap="round"><path d="M6 3v3M6 8v.5"/><circle cx="6" cy="6" r="5"/></svg>Urgent?</div>
+          <div class="qchip" onclick="dashAI('Give me a motivational message to keep going today')"><svg viewBox="0 0 12 12" stroke-width="2" stroke-linecap="round"><path d="M6 1l1 2.2 2.4.3-1.7 1.7.4 2.4L6 6.5 3.9 7.6l.4-2.4-1.7-1.7 2.4-.3z"/></svg>Motivate!</div>
+        </div>
+        <div id="d-ai" style="font-size:13.5px;color:var(--txt2);font-weight:600;line-height:1.7;min-height:40px">Tap a button to get AI help based on your actual tasks!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TASKS ═══ -->
+  <div class="page" id="pg-tasks">
+    <div class="pg-head"><h1>My Tasks</h1><p>Tap the circle to mark done. Tap the trash to delete.</p></div>
+    <div class="sbox"><svg viewBox="0 0 16 16" stroke-width="2" stroke-linecap="round"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg><input type="text" placeholder="Search tasks…" id="tsrch" oninput="renderTasks()"></div>
+    <div class="fbar">
+      <div class="fpill active" onclick="setF('all',this)">All tasks</div>
+      <div class="fpill" onclick="setF('pending',this)">To do</div>
+      <div class="fpill" onclick="setF('done',this)">Completed</div>
+      <div class="fpill" onclick="setF('overdue',this)">Overdue</div>
+    </div>
+    <div style="padding:13px 18px 0" id="tlist"></div>
+  </div>
+
+  <!-- ═══ AI CHAT ═══ -->
+  <div class="page" id="pg-ai">
+    <div class="pg-head"><h1>AI Assistant</h1><p>I know all your tasks — ask me anything!</p></div>
+    <div class="chat-wrap">
+      <div class="ai-hdr">
+        <div class="ai-orb"><svg viewBox="0 0 20 20" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="4"/><path d="M10 1v2M10 17v2M1 10h2M17 10h2M3.05 3.05l1.41 1.41M15.54 15.54l1.41 1.41M3.05 16.95l1.41-1.41M15.54 4.46l1.41-1.41"/></svg></div>
+        <div><div class="ai-ttl">Planora AI</div><div class="ai-sub">Powered by Claude · Sees all your tasks</div></div>
+      </div>
+      <div class="qchips">
+        <div class="qchip" onclick="chip('What should I work on right now?')"><svg viewBox="0 0 12 12" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 4v2l1.5 1.5"/></svg>What next?</div>
+        <div class="qchip" onclick="chip('Which tasks are overdue or at risk?')"><svg viewBox="0 0 12 12" stroke-width="2" stroke-linecap="round"><path d="M6 3v3M6 8v.5"/><circle cx="6" cy="6" r="5"/></svg>Urgent tasks</div>
+        <div class="qchip" onclick="chip('Make a plan for my day with all my pending tasks')"><svg viewBox="0 0 12 12" stroke-width="2" stroke-linecap="round"><rect x="1" y="1" width="10" height="10" rx="1.5"/><path d="M1 4.5h10M4 1v3.5"/></svg>Plan my day</div>
+        <div class="qchip" onclick="chip('Break my most important task into smaller steps')"><svg viewBox="0 0 12 12" stroke-width="2" stroke-linecap="round"><path d="M2 3h8M2 6h6M2 9h4"/></svg>Break a task</div>
+        <div class="qchip" onclick="chip('Motivate me to get started today')"><svg viewBox="0 0 12 12" stroke-width="2" stroke-linecap="round"><path d="M6 1l1 2.2 2.4.3-1.7 1.7.4 2.4L6 6.5 3.9 7.6l.4-2.4-1.7-1.7 2.4-.3z"/></svg>Motivate me</div>
+        <div class="qchip" onclick="chip('How am I doing this week?')"><svg viewBox="0 0 12 12" stroke-width="2" stroke-linecap="round"><path d="M1 9 3.5 6l2.5 2 2.5-3.5L11 6"/></svg>My progress</div>
+      </div>
+      <div class="msgs" id="msgs">
+        <div class="cmsg"><div class="cmav ai"><svg viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="4"/><path d="M10 1v2M10 17v2M1 10h2M17 10h2"/></svg></div><div class="cbub ai">Hi Alex! I'm Planora AI. I can see all your tasks right now — just ask me what to work on and I'll give you specific, honest advice. What's on your mind?</div></div>
+      </div>
+      <div class="cinrow">
+        <input class="cinput" id="cin" placeholder="Ask me anything…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}">
+        <button class="csend" onclick="send()"><svg viewBox="0 0 14 14" stroke-width="2" stroke-linecap="round"><path d="M12 7L2 2l2 5-2 5 10-5z"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ FOCUS ═══ -->
+  <div class="page" id="pg-focus">
+    <div class="pg-head"><h1>Focus Timer</h1><p>Work distraction-free and earn XP when done!</p></div>
+    <div class="timersec">
+      <div class="timerbox">
+        <div class="tstate" id="tstate">READY TO START</div>
+        <div class="tring">
+          <svg viewBox="0 0 160 160" width="160" height="160">
+            <defs><linearGradient id="tg" x1="0" y1="0" x2="100%" y2="100%"><stop offset="0%" stop-color="#4f6ef7"/><stop offset="100%" stop-color="#22c98e"/></linearGradient></defs>
+            <circle class="t-track" cx="80" cy="80" r="70"/>
+            <circle class="t-fill" id="tfill" cx="80" cy="80" r="70" stroke-dashoffset="0"/>
+          </svg>
+          <div class="tinner"><div class="tnum" id="tnum">25:00</div><div class="tsub" id="tmode">Focus</div></div>
+        </div>
+        <div class="presets">
+          <button class="prst sel" onclick="setTimer(25,'Focus',this)">25 min</button>
+          <button class="prst" onclick="setTimer(15,'Deep Work',this)">15 min</button>
+          <button class="prst" onclick="setTimer(5,'Break',this)">5 min break</button>
+        </div>
+        <div class="tacts">
+          <button class="btn btn-blue" id="tbtn" onclick="togTimer()"><svg viewBox="0 0 14 14" stroke-width="2.2" stroke-linecap="round" fill="none" stroke="currentColor"><path d="M4 2l8 5-8 5z"/></svg>Start Focus</button>
+          <button class="btn btn-sm" onclick="rstTimer()"><svg viewBox="0 0 14 14" stroke-width="2" stroke-linecap="round" fill="none" stroke="currentColor"><path d="M1 7a6 6 0 1 0 1-3.5M1 1v4h4"/></svg></button>
+        </div>
+      </div>
+
+      <div class="tip" style="margin:0 0 14px">
+        <svg viewBox="0 0 18 18" stroke-linecap="round" stroke-width="1.8"><path d="M9 1v2M9 15v2M1 9h2M15 9h2M3.05 3.05l1.41 1.41M13.54 13.54l1.41 1.41"/><circle cx="9" cy="9" r="3"/></svg>
+        <p>When the timer finishes you earn <strong>+100 XP</strong>. Try 25 minutes of focused work with your phone face down!</p>
+      </div>
+
+      <div class="panel" style="margin:0 0 14px">
+        <div class="phead"><div class="ptitle">How are you feeling?</div></div>
+        <div class="mood-row" id="mood-row">
+          <div class="mood-item" onclick="setMood(this,'Tired')"><div class="mood-face"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="var(--txt2)" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><path d="M6.5 13.5 q3.5-2 7 0"/><circle cx="7" cy="8" r="1" fill="var(--txt2)"/><circle cx="13" cy="8" r="1" fill="var(--txt2)"/></svg></div><div class="mood-lbl">Tired</div></div>
+          <div class="mood-item" onclick="setMood(this,'Okay')"><div class="mood-face"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><path d="M7 13h6"/><circle cx="7" cy="8" r="1" fill="var(--orange)"/><circle cx="13" cy="8" r="1" fill="var(--orange)"/></svg></div><div class="mood-lbl">Okay</div></div>
+          <div class="mood-item" onclick="setMood(this,'Focused')"><div class="mood-face sel"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="var(--blue)" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><path d="M7 12 q3-3 6 0"/><circle cx="7" cy="8" r="1" fill="var(--blue)"/><circle cx="13" cy="8" r="1" fill="var(--blue)"/></svg></div><div class="mood-lbl sel">Focused</div></div>
+          <div class="mood-item" onclick="setMood(this,'Great')"><div class="mood-face"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><path d="M7 11.5 q3-4 6 0"/><circle cx="7" cy="7.5" r="1" fill="var(--green)"/><circle cx="13" cy="7.5" r="1" fill="var(--green)"/></svg></div><div class="mood-lbl">Great</div></div>
+          <div class="mood-item" onclick="setMood(this,'On Fire')"><div class="mood-face"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="var(--red)" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><path d="M6.5 12 q3.5-5 7 0"/><line x1="7" y1="8" x2="7" y2="6"/><line x1="13" y1="8" x2="13" y2="6"/></svg></div><div class="mood-lbl">On Fire</div></div>
+        </div>
+        <div class="mood-status" id="mood-txt">FEELING: FOCUSED</div>
+      </div>
+
+      <div style="font-size:16px;font-weight:900;margin-bottom:10px">Daily Habits</div>
+      <div id="hlist"></div>
+    </div>
+  </div>
+
+  <!-- ═══ REWARDS ═══ -->
+  <div class="page" id="pg-rewards">
+    <div class="pg-head"><h1>Your Rewards</h1><p>Earn XP by completing tasks. Level up and collect badges!</p></div>
+    <div class="rsec">
+      <div class="streak-hero">
+        <div class="sbolt"><svg viewBox="0 0 22 22" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <div><div class="snum streak-number" id="rw-streak">8</div><div class="slbl" id="streak-sub">8 days in a row — keep it up!</div><div class="sbest">Best: 12 days</div></div>
+        <div style="flex:1"></div>
+        <div style="text-align:right"><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700" id="xpbig">1,240</div><div style="font-size:11px;opacity:.75;font-weight:800">XP EARNED</div></div>
+      </div>
+      <div class="lvl-box">
+        <div class="lvl-ic"><svg viewBox="0 0 26 26" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M13 2l2.5 5 5.5.8-4 3.9.9 5.5L13 15l-4.9 2.2.9-5.5-4-3.9 5.5-.8z"/></svg></div>
+        <div class="lvl-body">
+          <div class="lvl-name">Productivity Hero</div>
+          <div class="lvl-xp" id="xplbl">1,240 / 2,000 XP to Level 6</div>
+          <div class="xpbar"><div class="xpfill" id="xpfill" style="width:62%"></div></div>
+          <div class="lvl-tag">LEVEL 5</div>
+        </div>
+      </div>
+      <div style="font-size:16px;font-weight:900;margin-bottom:10px">Badges</div>
+      <div class="badges-g">
+        <div class="bdg earn"><div class="bdg-ic" style="background:var(--green-lt)"><svg viewBox="0 0 22 22" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><path d="M3 11l5 5 11-11"/></svg></div><div class="bdg-n">First Step</div><div class="bdg-d">Completed first task</div></div>
+        <div class="bdg earn"><div class="bdg-ic" style="background:var(--orange-lt)"><svg viewBox="0 0 22 22" stroke="var(--orange)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M11 7v4l3 3"/></svg></div><div class="bdg-n">Early Bird</div><div class="bdg-d">Done before deadline</div></div>
+        <div class="bdg earn"><div class="bdg-ic" style="background:var(--red-lt)"><svg viewBox="0 0 22 22" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><path d="M12 2L3 14h9l-1 7 9-12h-9l1-7z"/></svg></div><div class="bdg-n">On Fire</div><div class="bdg-d">7-day streak</div></div>
+        <div class="bdg earn"><div class="bdg-ic" style="background:var(--blue-lt)"><svg viewBox="0 0 22 22" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M11 2l2 4.5 5 .7-3.5 3.5.8 5L11 13.4 6.7 15.7l.8-5L4 7.2l5-.7z"/></svg></div><div class="bdg-n">Prod Star</div><div class="bdg-d">50 tasks done</div></div>
+        <div class="bdg lock"><div class="bdg-ic" style="background:var(--purple-lt)"><svg viewBox="0 0 22 22" stroke="var(--purple)" stroke-width="2" stroke-linecap="round"><rect x="5" y="10" width="12" height="9" rx="2"/><path d="M8 10V7a4 4 0 0 1 6 0v3"/></svg></div><div class="bdg-n">Legend</div><div class="bdg-d">30-day streak</div></div>
+        <div class="bdg lock"><div class="bdg-ic" style="background:var(--green-lt)"><svg viewBox="0 0 22 22" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><polygon points="11,2 14,8 20,8.7 15.5,13 16.9,19 11,16 5.1,19 6.5,13 2,8.7 8,8"/></svg></div><div class="bdg-n">Diamond</div><div class="bdg-d">200 tasks done</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ NOTIFICATIONS ═══ -->
+  <div class="page" id="pg-notifications">
+    <div class="pg-head"><h1>Alerts</h1><p>Your reminders, overdue tasks, and achievements.</p></div>
+    <div class="nsec">
+      <div class="nitem"><div class="nic" style="background:var(--red-lt)"><svg viewBox="0 0 18 18" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><path d="M9 4v5M9 12v.5"/><circle cx="9" cy="9" r="8"/></svg></div><div class="nbody"><div class="ntitle">Overdue: Design Mockup Review</div><div class="ndesc">This task was due 2 days ago. Please take action.</div><div class="ntime">2 days ago</div></div></div>
+      <div class="nitem"><div class="nic" style="background:var(--blue-lt)"><svg viewBox="0 0 18 18" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M9 1a5 5 0 0 1 5 5v3l1.5 2H2.5L4 9V6a5 5 0 0 1 5-5z"/><path d="M7 15a2 2 0 0 0 4 0"/></svg></div><div class="nbody"><div class="ntitle">Reminder: Project Report Due Tomorrow</div><div class="ndesc">Due at 5:00 PM — about 8 hours left.</div><div class="ntime">1 hour ago</div></div></div>
+      <div class="nitem"><div class="nic" style="background:var(--green-lt)"><svg viewBox="0 0 18 18" stroke="var(--green)" stroke-width="2" stroke-linecap="round"><path d="M9 1l2 4 4.5.6-3.2 3.2.75 4.5L9 11.5l-4.05 2.1.75-4.5L2.5 5.6l4.5-.6z"/></svg></div><div class="nbody"><div class="ntitle">Badge Unlocked: Productivity Star!</div><div class="ndesc">You completed 50 tasks. +200 XP awarded!</div><div class="ntime">3 hours ago</div></div></div>
+    </div>
+  </div>
+
+  <!-- ═══ SETTINGS ═══ -->
+  <div class="page" id="pg-settings">
+    <div class="pg-head"><h1>Settings</h1><p>Customize how Planora works for you.</p></div>
+    <div class="ssec">
+      <div class="scard">
+        <div class="sc-head">Look &amp; Feel</div>
+        <div class="srow"><div class="sinfo"><div class="st">Dark Mode</div><div class="ss">Switch to a darker theme</div></div><div class="tog" id="dark-tog" onclick="togDark()"><div class="tok"></div></div></div>
+        <div class="srow"><div class="sinfo"><div class="st">Show XP &amp; Badges</div><div class="ss">See your points and achievements</div></div><div class="tog on"><div class="tok" style="transform:translateX(22px)"></div></div></div>
+      </div>
+      <div class="scard">
+        <div class="sc-head">Reminders</div>
+        <div class="srow"><div class="sinfo"><div class="st">Deadline Reminders</div><div class="ss">Remind me before tasks are due</div></div><div class="tog on"><div class="tok" style="transform:translateX(22px)"></div></div></div>
+        <div class="srow"><div class="sinfo"><div class="st">Overdue Alerts</div><div class="ss">Alert me when I miss a deadline</div></div><div class="tog on"><div class="tok" style="transform:translateX(22px)"></div></div></div>
+        <div class="srow"><div class="sinfo"><div class="st">AI Tips</div><div class="ss">Daily messages from Planora AI</div></div><div class="tog on"><div class="tok" style="transform:translateX(22px)"></div></div></div>
+      </div>
+      <div class="scard">
+        <div class="sc-head">Your Profile</div>
+        <div style="padding:16px">
+          <div class="fg"><label class="flbl">Your Name</label><input class="fi" value="Alex Johnson"></div>
+          <div class="fg"><label class="flbl">Email</label><input class="fi" value="alex@example.com" type="email"></div>
+          <div class="fg"><label class="flbl">How do you like to work?</label><select class="fsel"><option>Long focused sessions</option><option>Short 25-minute sprints</option><option>Flexible — whatever works</option></select></div>
+          <button class="btn btn-blue" style="flex:none;width:100%">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /scrl -->
+
+<!-- FAB -->
+<button class="fab" onclick="openModal()"><svg viewBox="0 0 14 14" stroke-width="2.8" stroke-linecap="round"><path d="M7 1v12M1 7h12"/></svg></button>
+
+<!-- ══════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-bg">
+    <div class="login-bg-grid"></div>
+    <div class="login-bg-glow1"></div>
+    <div class="login-bg-glow2"></div>
+    <div class="login-bg-glow3"></div>
+  </div>
+
+  <!-- Left branding panel -->
+  <div class="login-left">
+    <div class="login-left-inner">
+      <div class="login-logo-wrap">
+        <svg viewBox="0 0 22 22" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="18" height="16" rx="3"/>
+          <path d="M7 8h8M7 12h5M2 7h18"/>
+        </svg>
+      </div>
+      <div class="login-brand">Planora</div>
+      <div class="login-tagline">Your AI-powered personal planner.<br>Stay focused, beat deadlines, earn rewards.</div>
+      <div class="login-pills">
+        <div class="login-pill" style="animation-delay:.1s">
+          <div class="login-pill-icon" style="background:rgba(79,110,247,.35)">
+            <svg viewBox="0 0 19 19" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="9.5" cy="9.5" r="4"/><path d="M9.5 1v2M9.5 16v2M1 9.5h2M16 9.5h2"/></svg>
+          </div>
+          <div class="login-pill-text"><strong>AI Assistant</strong><span>Real advice from Claude, based on your tasks</span></div>
+        </div>
+        <div class="login-pill" style="animation-delay:.2s">
+          <div class="login-pill-icon" style="background:rgba(34,201,142,.3)">
+            <svg viewBox="0 0 19 19" fill="none" stroke-width="2" stroke-linecap="round"><path d="M9.5 1l2 4.5 5 .7-3.5 3.4.8 5L9.5 12l-4.3 2.1.8-5L2.5 5.7l5-.7z"/></svg>
+          </div>
+          <div class="login-pill-text"><strong>Gamification</strong><span>Earn XP, streaks, badges and level up</span></div>
+        </div>
+        <div class="login-pill" style="animation-delay:.3s">
+          <div class="login-pill-icon" style="background:rgba(249,168,37,.3)">
+            <svg viewBox="0 0 19 19" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="9.5" cy="9.5" r="7.5"/><path d="M9.5 6v3.5l2.5 2"/></svg>
+          </div>
+          <div class="login-pill-text"><strong>Focus Timer</strong><span>Deep work sessions that boost productivity</span></div>
+        </div>
+        <div class="login-pill" style="animation-delay:.4s">
+          <div class="login-pill-icon" style="background:rgba(168,85,247,.3)">
+            <svg viewBox="0 0 19 19" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 10l4 4 9-9"/><circle cx="9.5" cy="9.5" r="7.5"/></svg>
+          </div>
+          <div class="login-pill-text"><strong>Habit Tracker</strong><span>Build daily habits and track your streaks</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right form panel -->
+  <div class="login-right">
+    <!-- form area -->
+    <div id="auth-form-area" style="width:100%;max-width:340px">
+      <div class="login-form-logo">
+        <svg viewBox="0 0 22 22" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="18" height="16" rx="3"/><path d="M7 8h8M7 12h5M2 7h18"/>
+        </svg>
+      </div>
+      <div class="login-form-title">Welcome to Planora</div>
+      <div class="login-form-sub">Sign in or create your free account</div>
+
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</div>
+        <div class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</div>
+      </div>
+
+      <!-- SIGN IN -->
+      <div id="form-login">
+        <div class="lf-group">
+          <label class="lf-label">Email address</label>
+          <div class="lf-input-wrap">
+            <svg class="lf-icon" viewBox="0 0 17 17"><path d="M2 4h13a1 1 0 011 1v8a1 1 0 01-1 1H2a1 1 0 01-1-1V5a1 1 0 011-1z"/><path d="M1 5l7.5 5L16 5"/></svg>
+            <input class="lf-input" id="li-email" type="email" placeholder="you@example.com" autocomplete="email">
+          </div>
+          <div class="lf-error" id="li-email-err">Please enter a valid email</div>
+        </div>
+        <div class="lf-group">
+          <label class="lf-label">Password</label>
+          <div class="lf-input-wrap">
+            <svg class="lf-icon" viewBox="0 0 17 17"><rect x="3" y="8" width="11" height="8" rx="2"/><path d="M6 8V5a2.5 2.5 0 015 0v3"/></svg>
+            <input class="lf-input" id="li-pass" type="password" placeholder="Enter your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+            <svg class="lf-eye" id="li-eye" viewBox="0 0 17 17" onclick="togglePw('li-pass','li-eye')"><path d="M1 8.5S3.5 3 8.5 3s7.5 5.5 7.5 5.5S14 14 8.5 14 1 8.5 1 8.5z"/><circle cx="8.5" cy="8.5" r="2.5"/></svg>
+          </div>
+          <div class="lf-error" id="li-pass-err">Password must be at least 6 characters</div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin:-6px 0 14px">
+          <span style="font-size:12px;color:rgba(79,110,247,.8);cursor:pointer;font-weight:700" onclick="forgotPw()">Forgot password?</span>
+        </div>
+        <button class="lf-btn" onclick="doLogin()" id="li-btn">Sign In to Planora</button>
+        <div class="lf-or">or continue with</div>
+        <button class="lf-social" onclick="socialLogin('Google')">
+          <svg viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+          Continue with Google
+        </button>
+        <div class="lf-terms">By signing in you agree to our <a>Terms of Service</a> and <a>Privacy Policy</a></div>
+      </div>
+
+      <!-- SIGN UP -->
+      <div id="form-signup" style="display:none">
+        <div class="lf-group">
+          <label class="lf-label">Your Name</label>
+          <div class="lf-input-wrap">
+            <svg class="lf-icon" viewBox="0 0 17 17"><circle cx="8.5" cy="6" r="3.5"/><path d="M1.5 15c0-3.314 3.134-6 7-6s7 2.686 7 6"/></svg>
+            <input class="lf-input" id="su-name" type="text" placeholder="e.g. Alex Johnson" autocomplete="name">
+          </div>
+          <div class="lf-error" id="su-name-err">Please enter your name</div>
+        </div>
+        <div class="lf-group">
+          <label class="lf-label">Email address</label>
+          <div class="lf-input-wrap">
+            <svg class="lf-icon" viewBox="0 0 17 17"><path d="M2 4h13a1 1 0 011 1v8a1 1 0 01-1 1H2a1 1 0 01-1-1V5a1 1 0 011-1z"/><path d="M1 5l7.5 5L16 5"/></svg>
+            <input class="lf-input" id="su-email" type="email" placeholder="you@example.com" autocomplete="email">
+          </div>
+          <div class="lf-error" id="su-email-err">Please enter a valid email</div>
+        </div>
+        <div class="lf-group">
+          <label class="lf-label">Password</label>
+          <div class="lf-input-wrap">
+            <svg class="lf-icon" viewBox="0 0 17 17"><rect x="3" y="8" width="11" height="8" rx="2"/><path d="M6 8V5a2.5 2.5 0 015 0v3"/></svg>
+            <input class="lf-input" id="su-pass" type="password" placeholder="Create a password" autocomplete="new-password" oninput="checkPwStrength()" onkeydown="if(event.key==='Enter')doSignup()">
+            <svg class="lf-eye" id="su-eye" viewBox="0 0 17 17" onclick="togglePw('su-pass','su-eye')"><path d="M1 8.5S3.5 3 8.5 3s7.5 5.5 7.5 5.5S14 14 8.5 14 1 8.5 1 8.5z"/><circle cx="8.5" cy="8.5" r="2.5"/></svg>
+          </div>
+          <div class="pwd-strength">
+            <div class="pwd-str-bar"><div class="pwd-str-fill" id="pw-fill"></div></div>
+            <div class="pwd-str-lbl" id="pw-lbl">Enter a password</div>
+          </div>
+          <div class="lf-error" id="su-pass-err">Password must be at least 6 characters</div>
+        </div>
+        <button class="lf-btn" onclick="doSignup()" id="su-btn">Create My Account</button>
+        <div class="lf-or">or continue with</div>
+        <button class="lf-social" onclick="socialLogin('Google')">
+          <svg viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+          Sign up with Google
+        </button>
+        <div class="lf-terms">By signing up you agree to our <a>Terms of Service</a> and <a>Privacy Policy</a></div>
+      </div>
+    </div>
+
+    <!-- Success state -->
+    <div class="login-success" id="login-success">
+      <div class="success-check"><svg viewBox="0 0 34 34" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M5 17l9 9 15-15"/></svg></div>
+      <div class="success-title" id="success-title">Welcome to Planora!</div>
+      <div class="success-sub" id="success-sub">Taking you to your dashboard…</div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bnav">
+  <button class="bni active" id="bn-home" onclick="goPage('home')"><svg viewBox="0 0 22 22"><rect x="2" y="2" width="8" height="8" rx="2"/><rect x="12" y="2" width="8" height="8" rx="2"/><rect x="2" y="12" width="8" height="8" rx="2"/><rect x="12" y="12" width="8" height="8" rx="2"/></svg><span>Home</span></button>
+  <button class="bni" id="bn-tasks" onclick="goPage('tasks')"><svg viewBox="0 0 22 22"><path d="M3 6h16M3 11h10M3 16h7"/></svg><span>Tasks</span><span class="bni-dot" id="tbdg">3</span></button>
+  <button class="bni" id="bn-ai" onclick="goPage('ai')"><svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="4"/><path d="M11 1v3M11 18v3M1 11h3M18 11h3M3.8 3.8l2.12 2.12M16.08 16.08l2.12 2.12M3.8 18.2l2.12-2.12M16.08 5.92l2.12-2.12"/></svg><span>AI Chat</span></button>
+  <button class="bni" id="bn-focus" onclick="goPage('focus')"><svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="9"/><path d="M11 7v4l3 3"/></svg><span>Focus</span></button>
+  <button class="bni" id="bn-rewards" onclick="goPage('rewards')"><svg viewBox="0 0 22 22"><path d="M11 1l2.5 5 5.5.8-4 3.9.9 5.5L11 14.4l-4.9 2.2.9-5.5-4-3.9 5.5-.8z"/></svg><span>Rewards</span></button>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="mbg">
+  <div class="mbox">
+    <div class="mhandle"></div>
+    <div class="mtitle">Add a New Task</div>
+    <div class="fg"><label class="flbl">What needs to be done?</label><span class="fhint">Write a simple, clear task name</span><input class="fi" id="mt" placeholder="e.g. Finish the project report"></div>
+    <div class="fg"><label class="flbl">Details (optional)</label><textarea class="fi fta" id="md" placeholder="Extra notes or info…"></textarea></div>
+    <div class="frow">
+      <div class="fg"><label class="flbl">Category</label><select class="fsel" id="mc"><option>Work</option><option>Personal</option><option>Health</option><option>Learning</option><option>Finance</option></select></div>
+      <div class="fg"><label class="flbl">How urgent?</label><select class="fsel" id="mp"><option value="high">High</option><option value="med" selected>Medium</option><option value="low">Low</option><option value="urgent">Urgent!</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="flbl">Due date</label><input class="fi" id="mdd" type="date"></div>
+      <div class="fg"><label class="flbl">Reminder time</label><input class="fi" id="mr" type="time" value="09:00"></div>
+    </div>
+    <div class="macts">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-blue" onclick="addTask()"><svg viewBox="0 0 14 14" stroke-width="2.5" stroke-linecap="round" fill="none" stroke="currentColor"><path d="M7 1v12M1 7h12"/></svg>Add Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- CELEBRATION -->
+<div class="cel" id="cel">
+  <div class="cfwrap" id="cf"></div>
+  <div class="celbox">
+    <div class="cel-circle"><svg viewBox="0 0 28 28" stroke-width="2.5" stroke-linecap="round" fill="none" stroke="currentColor"><path d="M4 14l7 7 13-13"/></svg></div>
+    <div class="celtitle">Task Complete!</div>
+    <div class="celsub">Amazing work, Alex!</div>
+    <div class="celxp">+50 XP earned</div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="twrap" id="twrap"></div>
+
+<script>
+/* ══════════════════════════════════
+   LOGIN & AUTH
+══════════════════════════════════ */
+let currentUser = null;
+
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('form-signup').style.display = tab === 'signup' ? 'block' : 'none';
+  clearErrors();
+}
+
+function clearErrors() {
+  document.querySelectorAll('.lf-error').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.lf-input').forEach(i => i.classList.remove('error'));
+}
+
+function togglePw(inputId, eyeId) {
+  const inp = document.getElementById(inputId);
+  const eye = document.getElementById(eyeId);
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    eye.innerHTML = '<path d="M2 2l13 13M7.5 7.7A2.5 2.5 0 0011.3 11M4.5 4.9C2.6 6.2 1 8.5 1 8.5S3.5 14 8.5 14c1.2 0 2.3-.3 3.3-.8M8.5 3C13.5 3 16 8.5 16 8.5s-.7 1.3-1.9 2.5"/>';
+  } else {
+    inp.type = 'password';
+    eye.innerHTML = '<path d="M1 8.5S3.5 3 8.5 3s7.5 5.5 7.5 5.5S14 14 8.5 14 1 8.5 1 8.5z"/><circle cx="8.5" cy="8.5" r="2.5"/>';
+  }
+}
+
+function checkPwStrength() {
+  const pw = document.getElementById('su-pass').value;
+  const fill = document.getElementById('pw-fill');
+  const lbl = document.getElementById('pw-lbl');
+  let score = 0;
+  if (pw.length >= 6) score++;
+  if (pw.length >= 10) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const levels = [
+    {w:'0%', c:'transparent', t:'Enter a password'},
+    {w:'25%', c:'#f25c54', t:'Weak'},
+    {w:'50%', c:'#f9a825', t:'Fair'},
+    {w:'75%', c:'#4f6ef7', t:'Good'},
+    {w:'100%', c:'#22c98e', t:'Strong'},
+  ];
+  const lvl = levels[Math.min(score, 4)];
+  fill.style.width = lvl.w; fill.style.background = lvl.c; lbl.textContent = lvl.t;
+}
+
+function forgotPw() {
+  alert('Password reset link will be sent to your email.');
+}
+
+function socialLogin(provider) {
+  const btn = event.currentTarget;
+  btn.textContent = 'Connecting…'; btn.disabled = true;
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>Continue with Google`;
+    doSignInSuccess('Alex', 'alex@gmail.com');
+  }, 1200);
+}
+
+function doLogin() {
+  clearErrors();
+  const email = document.getElementById('li-email').value.trim();
+  const pass = document.getElementById('li-pass').value;
+  let valid = true;
+  if (!email || !/\S+@\S+\.\S+/.test(email)) {
+    document.getElementById('li-email').classList.add('error');
+    document.getElementById('li-email-err').classList.add('show');
+    valid = false;
+  }
+  if (pass.length < 6) {
+    document.getElementById('li-pass').classList.add('error');
+    document.getElementById('li-pass-err').classList.add('show');
+    valid = false;
+  }
+  if (!valid) return;
+  const btn = document.getElementById('li-btn');
+  btn.textContent = 'Signing in…'; btn.disabled = true;
+  setTimeout(() => {
+    const name = email.split('@')[0].replace(/[^a-zA-Z]/g,' ').trim().replace(/\b\w/g,c=>c.toUpperCase()) || 'Alex';
+    doSignInSuccess(name, email);
+  }, 1100);
+}
+
+function doSignup() {
+  clearErrors();
+  const name = document.getElementById('su-name').value.trim();
+  const email = document.getElementById('su-email').value.trim();
+  const pass = document.getElementById('su-pass').value;
+  let valid = true;
+  if (!name) { document.getElementById('su-name').classList.add('error'); document.getElementById('su-name-err').classList.add('show'); valid = false; }
+  if (!email || !/\S+@\S+\.\S+/.test(email)) { document.getElementById('su-email').classList.add('error'); document.getElementById('su-email-err').classList.add('show'); valid = false; }
+  if (pass.length < 6) { document.getElementById('su-pass').classList.add('error'); document.getElementById('su-pass-err').classList.add('show'); valid = false; }
+  if (!valid) return;
+  const btn = document.getElementById('su-btn');
+  btn.textContent = 'Creating account…'; btn.disabled = true;
+  setTimeout(() => { doSignInSuccess(name, email); }, 1300);
+}
+
+function doSignInSuccess(name, email) {
+  currentUser = { name: name.split(' ')[0], fullName: name, email };
+  document.getElementById('auth-form-area').style.display = 'none';
+  const suc = document.getElementById('login-success');
+  suc.classList.add('show');
+  document.getElementById('success-title').textContent = `Welcome, ${currentUser.name}!`;
+  document.getElementById('success-sub').textContent = 'Taking you to your dashboard…';
+  setTimeout(() => {
+    document.getElementById('login-screen').classList.add('hidden');
+    document.querySelectorAll('.user-av').forEach(av => av.textContent = currentUser.name.slice(0,2).toUpperCase());
+    document.getElementById('greet').textContent = getGreeting() + ', ' + currentUser.name + '!';
+    init();
+  }, 1600);
+}
+
+function getGreeting() {
+  const h = new Date().getHours();
+  return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+}
+
+/* ══════════════════════════════════
+   FLOATING ORBS (login bg)
+══════════════════════════════════ */
+(function spawnOrbs() {
+  const wrap = document.querySelector('.login-bg');
+  if (!wrap) return;
+  const cols = ['rgba(79,110,247,.25)', 'rgba(34,201,142,.2)', 'rgba(168,85,247,.2)', 'rgba(249,168,37,.18)'];
+  for (let i = 0; i < 12; i++) {
+    const orb = document.createElement('div');
+    const size = 6 + Math.random() * 16;
+    orb.className = 'orb';
+    orb.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;background:${cols[i%4]};animation-duration:${10+Math.random()*18}s;animation-delay:${Math.random()*10}s`;
+    wrap.appendChild(orb);
+  }
+})();
+
+/* ══════════════════════════════════
+   APP DATA
+══════════════════════════════════ */
+let tasks=[
+  {id:1,title:"Finish project report",desc:"Complete all sections and proofread",cat:"Work",priority:"high",deadline:"2025-03-21",done:false,overdue:false},
+  {id:2,title:"Morning workout",desc:"30 min cardio + stretching",cat:"Health",priority:"med",deadline:"2025-03-20",done:true,overdue:false},
+  {id:3,title:"Study React hooks",desc:"Read docs on useState and useEffect",cat:"Learning",priority:"low",deadline:"2025-03-25",done:false,overdue:false},
+  {id:4,title:"Design mockup review",desc:"Review UI designs with the team",cat:"Work",priority:"urgent",deadline:"2025-03-18",done:false,overdue:true},
+  {id:5,title:"Pay electricity bill",desc:"Due by end of month",cat:"Finance",priority:"high",deadline:"2025-03-31",done:false,overdue:false},
+  {id:6,title:"Grocery shopping",desc:"Vegetables, fruits, weekly basics",cat:"Personal",priority:"med",deadline:"2025-03-20",done:true,overdue:false},
+  {id:7,title:"Update portfolio site",desc:"Add recent projects and bio",cat:"Work",priority:"med",deadline:"2025-03-28",done:false,overdue:false},
+  {id:8,title:"Standup meeting prep",desc:"Prepare agenda and Jira updates",cat:"Work",priority:"high",deadline:"2025-03-22",done:true,overdue:false},
+];
+let habits=[
+  {name:"Drink 2L water",days:[1,1,1,1,0,0,0],streak:4,col:'var(--blue)',bg:'var(--blue-lt)',icon:'<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 2C11 2 4 9 4 14a7 7 0 0 0 14 0c0-5-7-12-7-12z"/></svg>'},
+  {name:"30 min workout",days:[1,1,0,1,0,0,0],streak:3,col:'var(--green)',bg:'var(--green-lt)',icon:'<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 11h2l2-5 4 10 3-7 2 2h3"/></svg>'},
+  {name:"Read 20 pages",days:[1,1,1,0,0,0,0],streak:3,col:'var(--purple)',bg:'var(--purple-lt)',icon:'<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4h8a2 2 0 0 1 2 2v13a1 1 0 0 1-1-1H2V4z"/><path d="M20 4h-8a2 2 0 0 0-2 2v13a1 1 0 0 0 1-1h9V4z"/></svg>'},
+  {name:"Meditate 10 min",days:[1,0,1,1,0,0,0],streak:2,col:'var(--orange)',bg:'var(--orange-lt)',icon:'<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="9"/><path d="M11 7v4M11 14v.5"/></svg>'},
+  {name:"No phone before 10am",days:[1,1,1,1,0,0,0],streak:4,col:'var(--red)',bg:'var(--red-lt)',icon:'<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="10" height="18" rx="3"/><path d="M11 17v.01"/></svg>'},
+];
+
+let xp = 1240;
+let tFilter = 'all';
+let chatHistory = [];
+let timerSec = 1500, timerTotal = 1500, timerOn = false, timerInt = null;
+let curPage = 'home';
+
+/* ══════════════════════════════════
+   STREAK SYSTEM (localStorage-based)
+══════════════════════════════════ */
+const STREAK_KEY = 'planora_streak';
+const LAST_ACTIVE_KEY = 'planora_last_active';
+const TASKS_DONE_TODAY_KEY = 'planora_done_today';
+
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function loadStreak() {
+  const saved = localStorage.getItem(STREAK_KEY);
+  const lastActive = localStorage.getItem(LAST_ACTIVE_KEY);
+  const today = todayStr();
+  if (!saved) {
+    // First time — start fresh
+    return { count: 0, lastActive: null, doneToday: 0 };
+  }
+  const streak = parseInt(saved) || 0;
+  if (!lastActive) return { count: streak, lastActive: null, doneToday: 0 };
+
+  const doneToday = parseInt(localStorage.getItem(TASKS_DONE_TODAY_KEY) || '0');
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+  if (lastActive === today) {
+    // Active today — streak still valid
+    return { count: streak, lastActive: today, doneToday };
+  } else if (lastActive === yesterdayStr) {
+    // Was active yesterday — streak is still valid, just waiting for today's task
+    return { count: streak, lastActive: lastActive, doneToday: 0 };
+  } else {
+    // Missed at least one full day — streak broken
+    return { count: 0, lastActive: null, doneToday: 0 };
+  }
+}
+
+function saveStreak(count, doneToday) {
+  localStorage.setItem(STREAK_KEY, count.toString());
+  localStorage.setItem(LAST_ACTIVE_KEY, todayStr());
+  localStorage.setItem(TASKS_DONE_TODAY_KEY, doneToday.toString());
+}
+
+function onTaskCompleted() {
+  let { count, lastActive, doneToday } = loadStreak();
+  const today = todayStr();
+  doneToday += 1;
+
+  // First task of the day completed
+  if (lastActive !== today) {
+    count += 1; // Extend or start streak
+  }
+
+  saveStreak(count, doneToday);
+  renderStreak();
+}
+
+function renderStreak() {
+  const { count, doneToday } = loadStreak();
+
+  // Update all streak number displays
+  document.querySelectorAll('.streak-number').forEach(el => { el.textContent = count; });
+
+  // Update week dots — highlight today and last N days of streak
+  const today = new Date();
+  const dayOfWeek = today.getDay(); // 0=Sun,1=Mon...
+  // Map M T W T F S S index to day-of-week
+  const dayMap = [1,2,3,4,5,6,0]; // Mon=index0 → day 1
+  document.querySelectorAll('.week-dot').forEach((dot, idx) => {
+    const dotDay = dayMap[idx];
+    // Calculate how many days ago this dot is relative to today
+    let daysAgo = (today.getDay() - dotDay + 7) % 7;
+    if (daysAgo === 0) {
+      // today
+      dot.classList.toggle('done', doneToday > 0);
+      dot.classList.add('today');
+      dot.classList.remove('done'); // will re-add below if done today
+      if (doneToday > 0) dot.classList.add('done');
+    } else {
+      dot.classList.remove('today');
+      dot.classList.toggle('done', daysAgo < count);
+    }
+  });
+
+  // Update streak sub-text
+  const streakSub = document.getElementById('streak-sub');
+  if (streakSub) {
+    if (doneToday === 0) streakSub.textContent = 'Complete a task today to keep it going!';
+    else if (count === 1) streakSub.textContent = 'Great start — you completed a task today!';
+    else streakSub.textContent = `${count} days in a row — keep it up!`;
+  }
+
+  // Rewards page streak
+  const rwStreak = document.getElementById('rw-streak');
+  if (rwStreak) rwStreak.textContent = count;
+}
+
+/* ══════════════════════════════════
+   NAV
+══════════════════════════════════ */
+const pageMap = {
+  'home':'bn-home','tasks':'bn-tasks','ai':'bn-ai','focus':'bn-focus','rewards':'bn-rewards',
+  'notifications':null,'settings':null
+};
+function goPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bni').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pg-'+name).classList.add('active');
+  const bid=pageMap[name];
+  if(bid&&document.getElementById(bid))document.getElementById(bid).classList.add('active');
+  document.getElementById('scrl').scrollTo(0,0);
+  curPage=name;
+  if(name==='tasks')renderTasks();
+  if(name==='focus')renderHabits();
+  if(name==='rewards'){syncXP();renderStreak();}
+}
+
+/* ══════════════════════════════════
+   THEME
+══════════════════════════════════ */
+function togDark(){
+  document.body.classList.toggle('dark');
+  const on=document.body.classList.contains('dark');
+  const t=document.getElementById('dark-tog');
+  t.classList.toggle('on',on);
+  t.querySelector('.tok').style.transform=on?'translateX(22px)':'';
+}
+
+/* ══════════════════════════════════
+   MODAL
+══════════════════════════════════ */
+function openModal(){document.getElementById('mbg').classList.add('open');document.getElementById('mdd').value=new Date().toISOString().split('T')[0];setTimeout(()=>document.getElementById('mt').focus(),300)}
+function closeModal(){document.getElementById('mbg').classList.remove('open')}
+document.getElementById('mbg').addEventListener('click',e=>{if(e.target===document.getElementById('mbg'))closeModal()});
+
+/* ══════════════════════════════════
+   TASKS
+══════════════════════════════════ */
+function addTask(){
+  const t=document.getElementById('mt').value.trim();
+  if(!t){document.getElementById('mt').style.borderColor='var(--red)';document.getElementById('mt').focus();return}
+  tasks.unshift({id:Date.now(),title:t,desc:document.getElementById('md').value,cat:document.getElementById('mc').value,priority:document.getElementById('mp').value,deadline:document.getElementById('mdd').value,done:false,overdue:false});
+  xp+=50;
+  document.getElementById('mt').value='';document.getElementById('md').value='';document.getElementById('mt').style.borderColor='';
+  closeModal();sync();toast('Task added! +50 XP ✓');
+}
+
+function togTask(id){
+  const t=tasks.find(x=>x.id===id);if(!t)return;
+  const wasNotDone = !t.done;
+  t.done=!t.done;
+  if(wasNotDone){
+    xp+=50;
+    celebrate();
+    onTaskCompleted(); // ← update streak when task is completed
+  }
+  sync();
+}
+
+function delTask(id){if(!confirm('Delete this task?'))return;tasks=tasks.filter(x=>x.id!==id);sync();toast('Task deleted')}
+
+/* ══════════════════════════════════
+   SYNC (stats + streak + XP)
+══════════════════════════════════ */
+function sync(){
+  const tot=tasks.length,dn=tasks.filter(t=>t.done).length,pnd=tasks.filter(t=>!t.done&&!t.overdue).length,ov=tasks.filter(t=>t.overdue).length;
+  document.getElementById('s-tot').textContent=tot;
+  document.getElementById('s-dn').textContent=dn;
+  document.getElementById('s-pnd').textContent=pnd;
+  document.getElementById('s-ov').textContent=ov;
+  document.getElementById('tbdg').textContent=pnd;
+  const pct=tot>0?Math.round((dn/tot)*100):0;
+  document.getElementById('h-fill').style.width=pct+'%';
+  document.getElementById('h-pct').textContent=`${dn} of ${tot} tasks done (${pct}%)`;
+  document.getElementById('h-title').textContent=pnd>0?`You have ${pnd} task${pnd===1?'':'s'} to do`:'All caught up — amazing!';
+  document.getElementById('h-sub').textContent=ov>0?`⚠️ ${ov} task${ov===1?' is':'s are'} overdue`:dn>0?'Keep going — you\'re doing great!':'Add your first task to get started!';
+  syncXP();
+  renderStreak();
+  renderDashTasks();
+  if(curPage==='tasks')renderTasks();
+}
+
+function syncXP(){
+  const p=Math.min(100,Math.round((xp/2000)*100));
+  document.querySelectorAll('.xpfill').forEach(e=>e.style.width=p+'%');
+  document.getElementById('xplbl').textContent=`${xp.toLocaleString()} / 2,000 XP to Level 6`;
+  if(document.getElementById('xpbig'))document.getElementById('xpbig').textContent=xp.toLocaleString();
+}
+
+/* ══════════════════════════════════
+   TASK ROW / RENDER
+══════════════════════════════════ */
+function taskRow(t,card=false){
+  const pill=t.priority==='high'||t.priority==='urgent'?'ph':t.priority==='med'?'pm':'pl';
+  const plbl=t.priority==='urgent'?'Urgent!':t.priority.charAt(0).toUpperCase()+t.priority.slice(1);
+  return `<div class="trow" style="${card?'background:var(--surface);border:1.5px solid '+(t.overdue?'var(--red)':'var(--border)')+';border-radius:var(--r);margin-bottom:10px':''}">
+    <div class="chk${t.done?' done':''}" onclick="togTask(${t.id})"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M2 6l3 3 5-5"/></svg></div>
+    <div class="tinfo">
+      <div class="tname${t.done?' done':''}" style="${card?'white-space:normal':''}">${t.title}</div>
+      ${card&&t.desc?`<div style="font-size:12px;color:var(--txt2);font-weight:600;margin:4px 0 6px;line-height:1.5">${t.desc}</div>`:''}
+      <div class="tmeta">
+        <span class="pill ${pill}">${plbl}</span>
+        ${card?`<span class="pill" style="background:var(--blue-lt);color:var(--blue)">${t.cat}</span>`:''}
+        ${t.overdue?`<span class="pill po">Overdue</span>`:''}
+        ${t.deadline?`<span class="pdate"><svg viewBox="0 0 9 9" stroke-width="1.8" stroke-linecap="round"><rect x=".5" y=".5" width="8" height="8" rx="1"/><path d=".5 3h8M3 .5v1M6 .5v1"/></svg>${t.deadline}</span>`:''}
+        <span class="txp">+50</span>
+      </div>
+    </div>
+    ${card?`<div class="task-del" onclick="delTask(${t.id})" style="width:32px;height:32px;border-radius:9px;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0"><svg viewBox="0 0 13 13" fill="none" stroke="var(--txt3)" stroke-width="1.8" stroke-linecap="round"><path d="M2 3h9M5 3V2h3v1M4 3l.5 7.5h4L9 3"/></svg></div>`:''}
+  </div>`;
+}
+
+function renderDashTasks(){
+  const el=document.getElementById('dash-tasks');if(!el)return;
+  const today=new Date().toISOString().split('T')[0];
+  const arr=tasks.filter(t=>t.deadline===today||t.overdue).slice(0,5);
+  el.innerHTML=arr.length?arr.map(t=>taskRow(t,false)).join(''):`<div class="empty" style="padding:26px 20px"><div class="empty-ic"><svg viewBox="0 0 32 32" stroke="var(--blue)" fill="none" stroke-width="1.6" stroke-linecap="round"><path d="M4 8h24M4 16h16M4 24h10"/></svg></div><h3>No tasks due today!</h3><p>Enjoy your free time — or plan ahead.</p></div>`;
+}
+
+function renderTasks(){
+  const el=document.getElementById('tlist');if(!el)return;
+  const q=(document.getElementById('tsrch')?.value||'').toLowerCase();
+  const arr=tasks.filter(t=>{
+    const mq=!q||t.title.toLowerCase().includes(q)||t.cat.toLowerCase().includes(q);
+    const mf=tFilter==='all'||(tFilter==='done'&&t.done)||(tFilter==='pending'&&!t.done&&!t.overdue)||(tFilter==='overdue'&&t.overdue);
+    return mq&&mf;
+  });
+  el.innerHTML=arr.length?arr.map(t=>taskRow(t,true)).join(''):`<div class="empty"><div class="empty-ic"><svg viewBox="0 0 32 32" stroke="var(--blue)" fill="none" stroke-width="1.6" stroke-linecap="round"><path d="M4 8h24M4 16h16M4 24h10"/></svg></div><h3>No tasks found</h3><p>Try a different filter, or add a new task with the + button!</p><button class="btn btn-blue btn-sm" onclick="openModal()">Add a task</button></div>`;
+}
+function setF(f,btn){tFilter=f;document.querySelectorAll('.fpill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTasks()}
+
+/* ══════════════════════════════════
+   HABITS
+══════════════════════════════════ */
+function renderHabits(){
+  const el=document.getElementById('hlist');if(!el)return;
+  el.innerHTML=habits.map((h,i)=>`<div class="habit-item"><div class="habit-ic" style="background:${h.bg};color:${h.col}">${h.icon}</div><div class="habit-body"><div class="habit-name">${h.name}</div><div class="hdays">${h.days.map((d,di)=>`<div class="hday${d?' done':''}" onclick="togHabit(${i},${di})"></div>`).join('')}</div></div><div class="hstreak">${h.streak}d</div></div>`).join('');
+}
+function togHabit(hi,di){habits[hi].days[di]=habits[hi].days[di]?0:1;habits[hi].streak=habits[hi].days.filter(Boolean).length;renderHabits()}
+
+/* ══════════════════════════════════
+   TIMER
+══════════════════════════════════ */
+function setTimer(min,label,btn){
+  if(timerOn){clearInterval(timerInt);timerOn=false}
+  timerSec=min*60;timerTotal=timerSec;
+  updTimer();document.getElementById('tmode').textContent=label;document.getElementById('tstate').textContent='READY TO START';
+  document.getElementById('tbtn').innerHTML='<svg viewBox="0 0 14 14" stroke-width="2.2" stroke-linecap="round" fill="none" stroke="currentColor"><path d="M4 2l8 5-8 5z"/></svg>Start Focus';
+  document.querySelectorAll('.prst').forEach(p=>p.classList.remove('sel'));if(btn)btn.classList.add('sel');
+}
+function togTimer(){
+  if(timerOn){clearInterval(timerInt);timerOn=false;document.getElementById('tstate').textContent='PAUSED';document.getElementById('tbtn').innerHTML='<svg viewBox="0 0 14 14" stroke-width="2.2" stroke-linecap="round" fill="none" stroke="currentColor"><path d="M4 2l8 5-8 5z"/></svg>Resume';}
+  else{timerOn=true;document.getElementById('tstate').textContent='FOCUSING…';document.getElementById('tbtn').innerHTML='<svg viewBox="0 0 14 14" stroke-width="2.2" stroke-linecap="round" fill="none" stroke="currentColor"><path d="M4 2v10M10 2v10"/></svg>Pause';
+    timerInt=setInterval(()=>{if(timerSec<=0){clearInterval(timerInt);timerOn=false;document.getElementById('tstate').textContent='DONE! Great work!';xp+=100;syncXP();toast('Focus done! +100 XP');celebrate();return}timerSec--;updTimer()},1000);}
+}
+function rstTimer(){clearInterval(timerInt);timerOn=false;timerSec=timerTotal;updTimer();document.getElementById('tstate').textContent='READY TO START';document.getElementById('tbtn').innerHTML='<svg viewBox="0 0 14 14" stroke-width="2.2" stroke-linecap="round" fill="none" stroke="currentColor"><path d="M4 2l8 5-8 5z"/></svg>Start Focus';}
+function updTimer(){const m=Math.floor(timerSec/60),s=timerSec%60;document.getElementById('tnum').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;document.getElementById('tfill').style.strokeDashoffset=Math.round(439.8*(1-timerSec/timerTotal));}
+function setMood(el,mood){
+  document.querySelectorAll('.mood-face').forEach(f=>f.classList.remove('sel'));
+  document.querySelectorAll('.mood-lbl').forEach(l=>l.classList.remove('sel'));
+  el.querySelector('.mood-face').classList.add('sel');
+  el.querySelector('.mood-lbl').classList.add('sel');
+  document.getElementById('mood-txt').textContent='FEELING: '+mood.toUpperCase();
+}
+
+/* ══════════════════════════════════
+   AI CHAT (real Claude)
+══════════════════════════════════ */
+function aiCtx(){
+  const { count, doneToday } = loadStreak();
+  const pnd=tasks.filter(t=>!t.done&&!t.overdue),ov=tasks.filter(t=>t.overdue),dn=tasks.filter(t=>t.done),hi=tasks.filter(t=>(t.priority==='urgent'||t.priority==='high')&&!t.done),today=new Date().toISOString().split('T')[0],dtd=tasks.filter(t=>t.deadline===today&&!t.done);
+  const userName = currentUser ? currentUser.name : 'Alex';
+  return `You are Planora AI — a warm, direct personal productivity assistant built into the Planora app. You can see ${userName}'s live task data below.
+
+Rules for your tone:
+- Talk like a smart, caring friend — never like a corporate bot
+- Always mention task names by name — never give generic advice
+- Keep it short (2–4 sentences) unless they ask for a full plan
+- If they sound stressed, be warm and empathetic first
+- Never start with "As your AI assistant..." — just talk naturally
+- If you don't have enough context, ask one clear follow-up question
+
+${userName}'s live task data (${today}):
+PENDING: ${pnd.map(t=>`"${t.title}" (${t.priority}, due ${t.deadline||'no date'}, ${t.cat})`).join(' | ')||'none'}
+OVERDUE: ${ov.map(t=>`"${t.title}" (was due ${t.deadline})`).join(' | ')||'none'}
+DUE TODAY: ${dtd.map(t=>`"${t.title}"`).join(', ')||'none'}
+URGENT/HIGH: ${hi.map(t=>`"${t.title}"`).join(', ')||'none'}
+COMPLETED: ${dn.length} tasks
+XP: ${xp} | Streak: ${count} days | Tasks done today: ${doneToday} | Level 5`;
+}
+
+async function callClaude(msg){
+  const msgs=[...chatHistory,{role:'user',content:msg}];
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:aiCtx(),messages:msgs})});
+    const d=await r.json();
+    const reply=d.content?.[0]?.text||"Something went wrong — try again!";
+    chatHistory.push({role:'user',content:msg},{role:'assistant',content:reply});
+    if(chatHistory.length>16)chatHistory=chatHistory.slice(-16);
+    return reply;
+  }catch(e){return "I can't connect right now. Check your internet and try again!"}
+}
+function addBubble(txt,who){
+  const el=document.getElementById('msgs');
+  const div=document.createElement('div');div.className='cmsg'+(who==='user'?' user':'');
+  div.innerHTML=`<div class="cmav ${who==='ai'?'ai':'you'}">${who==='ai'?'<svg viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="4"/><path d="M10 1v2M10 17v2M1 10h2M17 10h2"/></svg>':'AJ'}</div><div class="cbub ${who==='ai'?'ai':'user'}">${txt.replace(/\n/g,'<br>')}</div>`;
+  el.appendChild(div);el.scrollTop=el.scrollHeight;
+}
+function showTyping(){const el=document.getElementById('msgs');const d=document.createElement('div');d.id='typing';d.className='cmsg';d.innerHTML=`<div class="cmav ai"><svg viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="4"/><path d="M10 1v2M10 17v2M1 10h2M17 10h2"/></svg></div><div class="cbub typing"><span class="tdot"></span><span class="tdot"></span><span class="tdot"></span></div>`;el.appendChild(d);el.scrollTop=el.scrollHeight}
+function hideTyping(){const t=document.getElementById('typing');if(t)t.remove()}
+async function send(){const i=document.getElementById('cin');const m=i.value.trim();if(!m)return;i.value='';addBubble(m,'user');showTyping();const r=await callClaude(m);hideTyping();addBubble(r,'ai')}
+async function chip(txt){addBubble(txt,'user');showTyping();const r=await callClaude(txt);hideTyping();addBubble(r,'ai')}
+async function dashAI(txt){const el=document.getElementById('d-ai');el.style.color='var(--txt3)';el.textContent='Planora AI is thinking…';const r=await callClaude(txt);el.style.color='var(--txt1)';el.textContent=r}
+
+/* ══════════════════════════════════
+   CELEBRATE + TOAST
+══════════════════════════════════ */
+function celebrate(){
+  const cel=document.getElementById('cel'),cf=document.getElementById('cf');
+  cf.innerHTML='';const cols=['#4f6ef7','#22c98e','#f25c54','#f9a825','#a855f7'];
+  for(let i=0;i<24;i++){const p=document.createElement('div');p.className='cf';p.style.cssText=`left:${Math.random()*100}%;top:-8px;background:${cols[i%5]};--dx:${(Math.random()-.5)*200}px;animation-delay:${Math.random()*.35}s;animation-duration:${2.2+Math.random()}s;border-radius:${Math.random()>.5?'50%':'2px'}`;cf.appendChild(p)}
+  cel.classList.add('show');setTimeout(()=>cel.classList.remove('show'),3000);
+}
+function toast(msg){const c=document.getElementById('twrap');const t=document.createElement('div');t.className='toast';t.textContent=msg;c.appendChild(t);setTimeout(()=>t.remove(),2800)}
+
+/* ══════════════════════════════════
+   INIT
+══════════════════════════════════ */
+function init(){
+  document.getElementById('greet').textContent = getGreeting() + ', ' + (currentUser ? currentUser.name : 'Alex') + '!';
+  document.getElementById('date-lbl').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  sync();
+  renderHabits();
+  renderStreak();
+}
+</script>
+</body>
+</html>
