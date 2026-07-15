@@ -44,3 +44,7 @@ Personal Tracker is a lightweight planner web app for organizing daily tasks in 
 ## Repository
 
 GitHub: https://github.com/GowsalyaP-2121/Personal-Tracker
+
+## deployed link
+
+live link: https://extraordinary-marshmallow-b9330f.netlify.app/
